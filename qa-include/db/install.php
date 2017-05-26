@@ -100,7 +100,7 @@
 			'users' => array(
 				'userid' => $useridcoltype.' NOT NULL AUTO_INCREMENT',
 				'created' => 'DATETIME NOT NULL',
-				'createip' => 'INT UNSIGNED NOT NULL', // INET_ATON of IP address when created
+				'createip' => 'VARBINARY(16) NOT NULL', // INET_ATON  or INET6_ATON of IP address when created
 				'email' => 'VARCHAR('.QA_DB_MAX_EMAIL_LENGTH.') NOT NULL',
 				'handle' => 'VARCHAR('.QA_DB_MAX_HANDLE_LENGTH.') NOT NULL', // username
 				'avatarblobid' => 'BIGINT UNSIGNED', // blobid of stored avatar
@@ -110,7 +110,7 @@
 				'passcheck' => 'BINARY(20)', // checksum from password and passsalt - null if no passowrd set for direct login
 				'level' => 'TINYINT UNSIGNED NOT NULL', // basic, editor, admin, etc...
 				'loggedin' => 'DATETIME NOT NULL', // time of last login
-				'loginip' => 'INT UNSIGNED NOT NULL', // INET_ATON of IP address of last login
+				'loginip' => 'VARBINARY(16) NOT NULL', // INET_ATON or INET6_ATON of IP address of last login
 				'written' => 'DATETIME', // time of last write action done by user
 				'writeip' => 'INT UNSIGNED', // INET_ATON of IP address of last write action done by user
 				'emailcode' => 'CHAR(8) CHARACTER SET ascii NOT NULL DEFAULT \'\'', // for email confirmation or password reset
