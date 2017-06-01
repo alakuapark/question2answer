@@ -26,7 +26,8 @@
 	}
 
 	define('QA_DB_VERSION_CURRENT', 59);
-
+	define('FUNCTION_StringToIp','CREATE FUNCTION `StringToIp`(`ip` VARCHAR(39)) RETURNS VARBINARY(16) BEGIN DECLARE s VARBINARY(16); IF IS_IPV6(ip) THEN set s=INET6_ATON(ip); ELSE set s=INET_ATON(ip); END IF; RETURN s; END;');
+  define('FUNCTION_IpToString','CREATE FUNCTION `IpToString`(`ip` VARBINARY(16)) RETURNS varchar(39) BEGIN DECLARE s varchar(39);   IF IS_IPV6(ip) THEN set  s=INET6_NTOA(ip); ELSE set s=INET_NTOA(ip);   END IF;     RETURN s;    END;');
 
 	function qa_db_user_column_type_verify()
 /*
@@ -679,8 +680,14 @@
 		}
 
 		qa_db_set_db_version(QA_DB_VERSION_CURRENT);
+		qa_db_install_functions();
 	}
 
+	function qa_db_install_functions()
+	{
+		qa_db_query_sub(FUNCTION_StringToIp);
+		qa_db_query_sub(FUNCTION_IpToString);
+  }
 
 	function qa_db_create_table_sql($rawname, $definition)
 /*
