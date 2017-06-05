@@ -25,9 +25,9 @@
 		exit;
 	}
 
-	define('QA_DB_VERSION_CURRENT', 59);
+	define('QA_DB_VERSION_CURRENT', 60);
 	define('FUNCTION_StringToIp','CREATE FUNCTION `StringToIp`(`ip` VARCHAR(39)) RETURNS VARBINARY(16) BEGIN DECLARE s VARBINARY(16); IF IS_IPV6(ip) THEN set s=INET6_ATON(ip); ELSE set s=INET_ATON(ip); END IF; RETURN s; END;');
-  define('FUNCTION_IpToString','CREATE FUNCTION `IpToString`(`ip` VARBINARY(16)) RETURNS varchar(39) BEGIN DECLARE s varchar(39);   IF IS_IPV6(ip) THEN set  s=INET6_NTOA(ip); ELSE set s=INET_NTOA(ip);   END IF;     RETURN s;    END;');
+  define('FUNCTION_IpToString','CREATE FUNCTION `IpToString`(`ip` VARBINARY(16)) RETURNS varchar(39)  BEGIN  IF IS_IPV6(INET6_NTOA(ip)) THEN RETURN INET6_NTOA(ip);   ELSE	RETURN INET_NTOA(ip);END IF;END');
 
 	function qa_db_user_column_type_verify()
 /*
@@ -678,9 +678,9 @@
 			foreach ($missingcolumns as $colname => $coldefn)
 				qa_db_query_sub('ALTER TABLE ^'.$table.' ADD COLUMN '.$colname.' '.$coldefn);
 		}
-
-		qa_db_set_db_version(QA_DB_VERSION_CURRENT);
 		qa_db_install_functions();
+		qa_db_set_db_version(QA_DB_VERSION_CURRENT);
+
 	}
 
 	function qa_db_install_functions()
@@ -1438,8 +1438,24 @@
 			//	Up to here: Verison 1.7
 
 				case 59:
-					// Upgrade from alpha version removed
+					qa_db_upgrade_query('ALTER TABLE ^blobs CHANGE COLUMN createip  createip '.$definitions['blobs']['createip']);
+					qa_db_upgrade_query('ALTER TABLE ^cookies CHANGE COLUMN createip  createip '.$definitions['cookies']['createip']);
+					qa_db_upgrade_query('ALTER TABLE ^cookies CHANGE COLUMN writeip  writeip '.$definitions['cookies']['writeip']);
+					qa_db_upgrade_query('ALTER TABLE ^iplimits CHANGE COLUMN ip  ip '.$definitions['iplimits']['ip']);
+					qa_db_upgrade_query('ALTER TABLE ^posts CHANGE COLUMN createip  createip '.$definitions['posts']['createip']);
+					qa_db_upgrade_query('ALTER TABLE ^posts CHANGE COLUMN lastip  lastip '.$definitions['posts']['lastip']);
+					qa_db_upgrade_query('ALTER TABLE ^posts CHANGE COLUMN lastviewip  lastviewip '.$definitions['posts']['lastviewip']);
+					qa_db_upgrade_query('ALTER TABLE ^users CHANGE COLUMN createip  createip '.$definitions['users']['createip']);
+					qa_db_upgrade_query('ALTER TABLE ^users CHANGE COLUMN loginip  loginip '.$definitions['users']['loginip']);
+					qa_db_upgrade_query('ALTER TABLE ^users CHANGE COLUMN writeip  writeip '.$definitions['users']['writeip']);
+					qa_db_install_functions();
+					qa_db_upgrade_query($locktablesquery);
 					break;
+
+				case 60:
+					break;
+
+
 
 			//	Up to here: Verison 1.7.1
 
